@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+vidboost-core = { path = "../crates/vidboost-core" }
 axum = "0.8"
 axum-extra = { version = "0.10", features = ["multipart"] }
 tokio = { version = "1", features = ["full"] }
