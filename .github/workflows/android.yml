@@ -1,0 +1,82 @@
+name: Build Android
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+  pull_request:
+    paths:
+      - 'src-tauri/**'
+      - 'app/**'
+      - 'crates/**'
+      - '.github/workflows/android.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  android:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - aarch64-linux-android
+          - armv7-linux-androideabi
+          - i686-linux-android
+          - x86_64-linux-android
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Android SDK 34 + NDK 26
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: 34
+          build-tools: '34.0.0'
+          ndk: '26.1.10909125'
+          cmake: '3.22.1'
+
+      - name: Setup Rust targets
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install frontend deps
+        run: bun install --frozen-lockfile
+
+      - name: Init Tauri Android project
+        run: bunx tauri android init --config src-tauri/tauri.android.conf.json
+
+      - name: Build frontend
+        run: bun run generate
+
+      - name: Build Android APK (debug, tanpa signing)
+        run: bunx tauri android build --target ${{ matrix.target }} --config src-tauri/tauri.android.conf.json --debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: vidboost-apk-${{ matrix.target }}
+          path: |
+            src-tauri/gen/android/app/build/outputs/**/*.apk
+          if-no-files-found: warn
+
+      - name: Release APK pada tag
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: src-tauri/gen/android/app/build/outputs/**/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
