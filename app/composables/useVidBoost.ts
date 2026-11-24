@@ -14,6 +14,7 @@ import {
   type StatusResponse,
   formatElapsed,
 } from '~/utils/vidboost'
+import { apiUrl, request } from '~/utils/api'
 
 const MAX_FILE_SIZE = 400 * 1024 * 1024
 
@@ -37,7 +38,7 @@ let initialized = false
 let pollTimer: ReturnType<typeof setInterval> | null = null
 let noticeTimer: ReturnType<typeof setTimeout> | null = null
 
-const api = (path: string): string => `${apiBase}${path}`
+const api = (path: string): string => apiUrl(`${apiBase}${path}`)
 
 const hasFile = computed(() => job.value !== null)
 const isProcessing = computed(() => job.value?.status === 'processing')
@@ -255,7 +256,7 @@ function startPolling(id: string) {
   stopPolling()
   pollTimer = setInterval(async () => {
     try {
-      const fresh = await $fetch<Job>(api(`/api/video/job?id=${encodeURIComponent(id)}`))
+      const fresh = await request<Job>(api(`/api/video/job?id=${encodeURIComponent(id)}`))
       const previousStatus = job.value?.status
       job.value = fresh
       errorHidden.value = false
@@ -318,7 +319,7 @@ async function uploadVideo(file: File) {
   try {
     const form = new FormData()
     form.append('file', file)
-    const created = await $fetch<Job>(api('/api/video/upload'), { method: 'POST', body: form })
+    const created = await request<Job>(api('/api/video/upload'), { method: 'POST', body: form })
     stopPolling()
     job.value = created
     previewMode.value = 'after'
@@ -343,7 +344,7 @@ async function uploadLogo(file: File) {
   try {
     const form = new FormData()
     form.append('file', file)
-    const result = await $fetch<{ path: string }>(
+    const result = await request<{ path: string }>(
       api(`/api/video/logo?id=${encodeURIComponent(job.value.id)}`),
       { method: 'POST', body: form },
     )
@@ -364,7 +365,7 @@ async function startProcess() {
   startElapsedTimer()
   appendLog('Proses dimulai')
   try {
-    const result = await $fetch<{ ok: boolean, id: string }>(api('/api/video/process'), {
+    const result = await request<{ ok: boolean, id: string }>(api('/api/video/process'), {
       method: 'POST',
       body: { id: job.value.id, settings: JSON.parse(JSON.stringify(settings)) as Settings },
     })
@@ -429,8 +430,8 @@ async function initVidBoost() {
   apiBase = (useRuntimeConfig().public.apiBase as string) || ''
 
   const [statusResult, modelsResult] = await Promise.allSettled([
-    $fetch<StatusResponse>(api('/api/status')),
-    $fetch<AiModel[]>(api('/api/ai/models')),
+    request<StatusResponse>(api('/api/status')),
+    request<AiModel[]>(api('/api/ai/models')),
   ])
   if (statusResult.status === 'fulfilled') {
     status.value = statusResult.value
@@ -467,7 +468,7 @@ async function initVidBoost() {
   const savedJobId = localStorage.getItem(JOB_STORAGE_KEY)
   if (savedJobId && !job.value) {
     try {
-      job.value = await $fetch<Job>(api(`/api/video/job?id=${encodeURIComponent(savedJobId)}`))
+      job.value = await request<Job>(api(`/api/video/job?id=${encodeURIComponent(savedJobId)}`))
       if (job.value.status === 'processing') startPolling(job.value.id)
     } catch {
       localStorage.removeItem(JOB_STORAGE_KEY)

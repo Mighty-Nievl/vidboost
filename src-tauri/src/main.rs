@@ -5,7 +5,15 @@ use std::io::Read;
 use std::path::PathBuf;
 
 use serde::Serialize;
+use serde_json::Value;
 use tauri::Manager;
+use vidboost_core::{base_filters, safe_upscale_factor, Job, JobRegistry, Settings, VideoMeta};
+
+static JOBS: std::sync::OnceLock<JobRegistry> = std::sync::OnceLock::new();
+
+fn jobs() -> &'static JobRegistry {
+    JOBS.get_or_init(JobRegistry::new)
+}
 
 const BACKEND_PORT: &str = "19090";
 
@@ -159,7 +167,70 @@ fn model_folder(app: tauri::AppHandle) -> Result<String, String> {
     Ok(models_dir(&app)?.to_string_lossy().into_owned())
 }
 
+#[tauri::command]
+fn default_settings() -> Settings {
+    Settings::default()
+}
+
+#[tauri::command]
+fn build_filters(settings: Settings, include_upscale: bool, factor: f64) -> Vec<String> {
+    base_filters(&settings, include_upscale, factor)
+}
+
+#[tauri::command]
+fn safe_factor(requested: f64, width: u64, height: u64, codec: String, cap: u64) -> f64 {
+    safe_upscale_factor(requested, width, height, &codec, cap)
+}
+
+#[tauri::command]
+fn probe_video(path: String) -> Result<VideoMeta, String> {
+    let output = std::process::Command::new("ffprobe")
+        .args(["-v", "quiet", "-print_format", "json", "-show_format", "-show_streams", &path])
+        .output()
+        .map_err(|e| e.to_string())?;
+    let value: Value = serde_json::from_slice(&output.stdout).map_err(|e| e.to_string())?;
+    let stream = value
+        .get("streams")
+        .and_then(Value::as_array)
+        .and_then(|items| items.iter().find(|s| s.get("codec_type").and_then(Value::as_str) == Some("video")))
+        .ok_or("Video stream tidak ditemukan")?;
+    let format = value.get("format").cloned().unwrap_or(Value::Null);
+    Ok(VideoMeta {
+        width: stream.get("width").and_then(Value::as_u64).unwrap_or(0),
+        height: stream.get("height").and_then(Value::as_u64).unwrap_or(0),
+        duration: format.get("duration").and_then(Value::as_str).and_then(|s| s.parse().ok()).unwrap_or(0.0),
+        fps: stream
+            .get("avg_frame_rate")
+            .and_then(Value::as_str)
+            .and_then(|rate| {
+                let mut parts = rate.split('/');
+                let a: f64 = parts.next()?.parse().ok()?;
+                let b: f64 = parts.next()?.parse().ok()?;
+                Some(a / b)
+            })
+            .unwrap_or(0.0),
+        codec: stream.get("codec_name").and_then(Value::as_str).unwrap_or("").to_string(),
+        bitrate: format.get("bit_rate").and_then(Value::as_str).and_then(|s| s.parse().ok()).unwrap_or(0),
+        mime: String::new(),
+    })
+}
+
+#[tauri::command]
+async fn get_job(id: String) -> Option<Job> {
+    jobs().get(&id).await
+}
+
+#[tauri::command]
+async fn list_jobs() -> Vec<Job> {
+    jobs().list().await
+}
+
 fn setup_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
+    let _registry = jobs();
+    let interrupted = tauri::async_runtime::block_on(_registry.mark_interrupted());
+    if interrupted > 0 {
+        eprintln!("menandai {interrupted} job terputus");
+    }
     let data = app.path().app_data_dir()?.join("vidboost");
     let models = data.join("models");
     let runtime = data.join("runtime");
@@ -209,6 +280,12 @@ fn main() {
             download_model,
             remove_model,
             model_folder,
+            default_settings,
+            build_filters,
+            safe_factor,
+            probe_video,
+            get_job,
+            list_jobs,
         ])
         .run(tauri::generate_context!())
         .expect("gagal menjalankan VidBoost");

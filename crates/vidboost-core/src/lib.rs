@@ -1,6 +1,8 @@
 pub mod filters;
+pub mod registry;
 pub mod types;
 
+pub use registry::JobRegistry;
 pub use filters::{
     base_filters, choose_codec, drawtext_position, estimate_bitrate, filter_quote, fmt_num,
     output_extension, overlay_position, preset_cpu_used, safe_upscale_factor, CodecChoice,
