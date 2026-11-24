@@ -7,6 +7,7 @@ use std::path::PathBuf;
 use serde::Serialize;
 use serde_json::Value;
 use tauri::Manager;
+use tauri_plugin_shell::ShellExt;
 use vidboost_core::{base_filters, safe_upscale_factor, Job, JobRegistry, Settings, VideoMeta};
 
 static JOBS: std::sync::OnceLock<JobRegistry> = std::sync::OnceLock::new();
@@ -258,7 +259,8 @@ fn setup_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     let backend_dir = data.join("bin");
     fs::create_dir_all(&backend_dir)?;
 
-    tauri::process::Command::new_sidecar("vidboost-server")?
+    app.shell()
+        .sidecar("vidboost-server")?
         .env("PORT", BACKEND_PORT)
         .env("DATA_DIR", data.join("data"))
         .env("AI_MODEL_DIR", &models)
@@ -273,6 +275,7 @@ fn setup_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
         .setup(setup_app)
         .invoke_handler(tauri::generate_handler![
             model_catalog,
