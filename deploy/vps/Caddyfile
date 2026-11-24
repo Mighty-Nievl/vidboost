@@ -1,0 +1,10 @@
+:18080 {
+	handle /api/* {
+		reverse_proxy 127.0.0.1:19000
+	}
+
+	handle {
+		root * /home/nievl/vidboost/site
+		file_server
+	}
+}
