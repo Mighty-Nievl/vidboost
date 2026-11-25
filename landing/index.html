@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="id" data-theme="clay-dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VidBoost — Video Enhancer Lokal</title>
+  <meta name="description" content="Enhance video di device sendiri. Warna, detail, upscale, watermark, crop — dengan AI lokal yang bisa didownload.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    try {
+      var t = localStorage.getItem('vidboost-theme')
+      if (t === 'clay-light' || t === 'clay-dark') document.documentElement.dataset.theme = t
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 12h18"/></svg>
+      </span>
+      <span>VidBoost</span>
+    </a>
+    <nav aria-label="Navigasi utama">
+      <a href="#fitur">Fitur</a>
+      <a href="#model">Model AI</a>
+      <a href="#cara">Cara pakai</a>
+    </nav>
+    <div class="top-actions">
+      <button id="themeToggle" class="icon-btn" type="button" aria-label="Ganti tema">◐</button>
+      <a class="btn btn-ghost" href="https://github.com/Mighty-Nievl/vidboost">GitHub</a>
+      <a class="btn btn-accent" href="https://github.com/Mighty-Nievl/vidboost/releases">Download</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Desktop · Lokal · Tanpa upload ke cloud</span>
+        <h1>Video lebih jernih,<br><span>diproses di device kamu.</span></h1>
+        <p class="lead">Atur warna, tajamkan detail, upscale, tambah watermark, dan ekspor. Semua berjalan lokal lewat Rust + ffmpeg. Model AI bisa didownload dan dipakai langsung di aplikasi.</p>
+        <div class="hero-actions">
+          <a class="btn btn-accent btn-lg" href="https://github.com/Mighty-Nievl/vidboost/releases">Unduh aplikasi</a>
+          <a class="btn btn-ghost btn-lg" href="#cara">Lihat cara kerja</a>
+        </div>
+        <p class="note">Tersedia untuk Linux · Windows · macOS · Android</p>
+      </div>
+
+      <div class="hero-art" aria-label="Ilustrasi panel aplikasi">
+        <div class="window">
+          <div class="window-bar"><i></i><i></i><i></i><span>vidboost</span></div>
+          <div class="window-body">
+            <div class="preview"><span>SESUDAH</span><div class="play">▶</div></div>
+            <div class="tabs"><b>Source</b><span>Warna</span><span>Detail</span><span>Upscale</span><span>Teks</span></div>
+            <div class="panel">
+              <div class="row"><span>Aktifkan upscale</span><i class="switch on"></i></div>
+              <div class="chips"><b>1x</b><b class="active">2x</b><b>3x</b><b>4x</b></div>
+              <div class="bar"><i style="width:64%"></i></div>
+              <div class="row small"><span>64%</span><span>Sisa 00:12</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="fitur" class="section">
+      <h2>Semua yang kamu butuhkan, satu panel</h2>
+      <div class="grid">
+        <article class="card"><div class="ico">◑</div><h3>Warna & detail</h3><p>Brightness, contrast, saturation, gamma, sharpen, dan denoise.</p></article>
+        <article class="card"><div class="ico">⤢</div><h3>Upscale</h3><p>Lanczos atau model AI lokal. Faktor efektif ditampilkan jujur.</p></article>
+        <article class="card"><div class="ico">▣</div><h3>Crop & watermark</h3><p>Rotasi, crop persen, teks atau logo dengan posisi dan opacity.</p></article>
+        <article class="card"><div class="ico">⇩</div><h3>Export fleksibel</h3><p>MP4, WebM, MOV, MKV dengan H.264, HEVC, VP9, atau AV1.</p></article>
+        <article class="card"><div class="ico">◷</div><h3>Progres hidup</h3><p>Progress ring, ETA, log proses, dan tombol batal yang beneran jalan.</p></article>
+        <article class="card"><div class="ico">◐</div><h3>Clay light & dark</h3><p>Dua tema dengan satu aksen. Transisi halus, tetap hormati reduced motion.</p></article>
+      </div>
+    </section>
+
+    <section id="model" class="section">
+      <h2>Pilih model sesuai device</h2>
+      <p class="section-lead">Model tidak dibundel. Download di aplikasi, simpan di device, pakai offline.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Model</th><th>Ukuran</th><th>Kecepatan</th><th>Kualitas</th><th>Cocok untuk</th></tr></thead>
+          <tbody>
+            <tr><td><b>FSRCNN</b> <span class="tag">default</span></td><td>39 KB</td><td>Sedang</td><td>Sedang</td><td>RAM 1 GB, stabil</td></tr>
+            <tr><td>ESPCN</td><td>100 KB</td><td>Paling cepat</td><td>Rendah</td><td>Video panjang</td></tr>
+            <tr><td>LapSRN</td><td>4 MB</td><td>Sedang</td><td>Cukup baik</td><td>Detail lebih tajam</td></tr>
+            <tr><td>EDSR</td><td>38 MB</td><td>Lambat</td><td>Tinggi</td><td>Device kuat</td></tr>
+            <tr><td>Real-ESRGAN</td><td>1–32 MB</td><td>CPU/GPU</td><td>Tertinggi</td><td>Vulkan stabil</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">Super-resolution memperkirakan detail — tidak mengembalikan data yang hilang dari video blur.</p>
+    </section>
+
+    <section id="cara" class="section">
+      <h2>Tiga langkah</h2>
+      <div class="steps">
+        <article><b>01</b><h3>Download & install</h3><p>Ambil installer dari halaman Releases untuk platform kamu.</p></article>
+        <article><b>02</b><h3>Pilih video & model</h3><p>Masukkan video, atur parameter, dan download model AI bila perlu.</p></article>
+        <article><b>03</b><h3>Export & simpan</h3><p>Tekan Enhance, pantau progres, lalu simpan hasilnya.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="brand"><span class="brand-mark" aria-hidden="true">▣</span> VidBoost</div>
+    <p>Rust · Nuxt · Tauri · ffmpeg</p>
+    <a href="https://github.com/Mighty-Nievl/vidboost">Source & dokumentasi</a>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

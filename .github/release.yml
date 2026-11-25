@@ -1,0 +1,23 @@
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+  categories:
+    - title: Fitur Baru
+      labels:
+        - enhancement
+        - feature
+    - title: Perbaikan
+      labels:
+        - bug
+        - fix
+    - title: Build & CI
+      labels:
+        - ci
+        - build
+    - title: Dokumentasi
+      labels:
+        - documentation
+    - title: Lainnya
+      labels:
+        - '*'

@@ -1,126 +1,128 @@
+<div align="center">
+
 # VidBoost
 
-Video enhancer lokal, full-stack. Upload video → atur warna, detail, upscale, crop, watermark → export. Semua proses berjalan di mesin sendiri, tidak ada data yang dikirim ke cloud.
+**Video enhancer lokal yang berjalan di device kamu.**
 
-- **Frontend:** Nuxt 4 + Tailwind 4 (Bun)
-- **Backend:** Rust + Axum + Tokio, mengorkestrasi ffmpeg
-- **AI opsional:** FSRCNN via OpenCV CPU (model 39 KB, tanpa Vulkan/GPU) — lihat [`docs/AI-ENHANCER.md`](docs/AI-ENHANCER.md)
+[![Build Tauri](https://github.com/Mighty-Nievl/vidboost/actions/workflows/build.yml/badge.svg)](https://github.com/Mighty-Nievl/vidboost/actions/workflows/build.yml)
+[![Build Android](https://github.com/Mighty-Nievl/vidboost/actions/workflows/android.yml/badge.svg)](https://github.com/Mighty-Nievl/vidboost/actions/workflows/android.yml)
+[![Deploy Landing](https://github.com/Mighty-Nievl/vidboost/actions/workflows/pages.yml/badge.svg)](https://github.com/Mighty-Nievl/vidboost/actions/workflows/pages.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-7fb524.svg)](LICENSE)
 
-## Fitur
+[Web · Landing](https://mighty-nievl.github.io/vidboost/) · [Download](https://github.com/Mighty-Nievl/vidboost/releases) · [Dokumentasi](docs/)
 
-| Grup | Kontrol |
+</div>
+
+---
+
+## Kenapa VidBoost?
+
+Sebagian tools video enhancement mengupload file kamu ke server. VidBoost melakukan sebaliknya: **semua proses berjalan lokal**, mulai dari koreksi warna sampai AI upscaling. Model AI tidak dibundel — kamu unduh sendiri dan pakai offline.
+
+- 🧱 **Backend Rust** + **ffmpeg** untuk encode yang cepat dan aman
+- 🖥️ **Tauri desktop** (Linux · Windows · macOS) dan **Android** (API 29+, semua ABI)
+- 🎨 **Claymorphism** dengan dua tema: light dan dark, satu aksen lime
+- 🧠 **AI lokal**: FSRCNN, ESPCN, LapSRN, EDSR, Real-ESRGAN
+- 📊 **Progress hidup**: progress ring, ETA, log proses, dan tombol batal nyata
+
+> ⚠️ Super-resolution **memperkirakan** detail, bukan mengembalikan data yang hilang. Untuk video yang benar-benar blur, kombinasi denoise + sharpen + kontras biasanya lebih terasa daripada sekadar memperbesar.
+
+## Tampilan
+
+| Area | Yang bisa kamu atur |
 |---|---|
-| Warna | Brightness, contrast, saturation, gamma |
-| Detail | Sharpen, denoise |
-| Upscale | 2×/3×/4× via Lanczos, atau AI lokal |
-| Crop & rotate | Rotasi 0/90/180/270, crop persen (X/Y/W/H) |
-| Watermark | Teks (font, ukuran, warna, posisi) atau logo gambar (skala, opacity, posisi) |
-| Output | MP4 / WebM / MOV / MKV · H.264 / HEVC / VP9 / AV1 · CRF · preset · audio on/off |
-| Preview | Sebelum / sesudah, atau split comparison dengan slider |
-| Progres | Polling status encode dengan persen dan tahap |
+| **Source** | Drag & drop video, metadata (resolusi, durasi, fps, codec), ganti file |
+| **Warna** | Brightness, contrast, saturation, gamma, reset ke netral |
+| **Detail** | Sharpen, denoise dengan hint efek samping |
+| **Upscale** | Faktor 1–4x, mode Lanczos atau AI, model AI, faktor efektif |
+| **Crop & rotate** | Rotasi 0/90/180/270, crop X/Y/W/H dalam persen |
+| **Teks** | Watermark teks atau logo, ukuran, warna, posisi, opacity |
+| **Export** | Format MP4/WebM/MOV/MKV, codec H.264/HEVC/VP9/AV1, CRF, preset, audio |
+| **Proses** | Full-screen overlay dengan progress ring, ETA, log, Batal, Lihat hasil |
 
-## Jalankan (development)
+Navigasi menyesuaikan device:
 
-Butuh **Bun**, **Rust (cargo)**, dan **ffmpeg + ffprobe** di PATH.
+- **Mobile**: bottom tab + sheet yang bisa diciutkan, preview tetap terlihat
+- **Desktop**: rail kategori di samping panel kontrol
 
-```bash
-# satu perintah untuk dua-duanya:
-bash scripts/dev.sh
+## Model AI
 
-# atau manual:
-# terminal 1 — backend
-(cd server-rs && cargo run)
-# terminal 2 — frontend
-bun install && bun run dev
-```
+| Model | Ukuran | Runtime | RAM | Kecepatan | Kualitas |
+|---|---|---|---|---|---|
+| **FSRCNN** (default) | 39 KB | OpenCV CPU | ~200 MB | Sedang | Sedang |
+| ESPCN | 100 KB | OpenCV CPU | ~150 MB | Paling cepat | Rendah |
+| LapSRN | 4 MB | OpenCV CPU | ~400 MB | Sedang | Cukup baik |
+| EDSR | 38 MB | OpenCV CPU | ~1 GB | Lambat | Tinggi |
+| Real-ESRGAN Anime v3 | 1,2 MB | Vulkan | ~300 MB | Cepat di GPU | Baik (anime) |
+| Real-ESRGAN x4plus | 32 MB | Vulkan | ~600 MB | Lambat | Tertinggi |
 
-Buka `http://localhost:3000`. Frontend mem-proxy `/api/**` ke `http://127.0.0.1:8080`. Kalau port 3000 sudah dipakai aplikasi lain, Nuxt otomatis naik ke 3001 (perhatikan URL yang ditampilkan di terminal).
+Detail kelebihan/kekurangan ada di halaman **Model AI** di dalam aplikasi dan di [`docs/MODELS.md`](docs/MODELS.md).
 
-Cek cepat:
+## Quickstart
 
-```bash
-curl http://127.0.0.1:8080/api/status
-```
+### Pakai aplikasi
 
-## Konfigurasi
+1. Download installer dari [Releases](https://github.com/Mighty-Nievl/vidboost/releases).
+2. Buka VidBoost → pilih video.
+3. Atur parameter → **Export** → **Enhance video**.
+4. Tunggu proses selesai → **Lihat hasil** → simpan video.
 
-Salin `.env.example` ke `.env`, lalu sesuaikan. Backend membaca env saat startup.
-
-| Env | Default | Keterangan |
-|---|---|---|
-| `PORT` | `8080` | Port backend Rust |
-| `DATA_DIR` | `/run/media/rezal/Data/vidboost` (fallback `.data`) | Tempat upload, output, `jobs.json` |
-| `FFMPEG_PATH` | `ffmpeg` | Path binary ffmpeg |
-| `FFPROBE_PATH` | `ffprobe` | Path binary ffprobe |
-| `DRAWTEXT_FONTFILE` | auto-detect | Font untuk watermark teks |
-| `AI_UPSCALER_BIN` | kosong | Path `realesrgan-ncnn-vulkan` |
-
-## Pasang AI upscaler (opsional)
+### Jalankan dari source (web/dev)
 
 ```bash
-bash scripts/setup-fsrcnn.sh
+bun install
+bun run dev          # frontend di :3000/3001
 ```
 
-Lalu isi `AI_UPSCALER_BIN` di `.env` dengan path yang ditampilkan script, restart backend, dan cek badge **AI ready** di header. Detail model, perbandingan RAM, dan alasan pilihannya ada di [`docs/AI-ENHANCER.md`](docs/AI-ENHANCER.md).
+> Aturan pengembangan: **build lokal hanya `bun`**. Semua build Rust, Tauri, dan Android dijalankan di GitHub Actions.
 
-## Struktur
+## Arsitektur
 
+```text
+app/                    Nuxt 4 + Tailwind 4 (UI, komponen, composable)
+crates/vidboost-core/   Logika Rust murni: tipe, filter, codec, registry job
+server-rs/              Axum HTTP API (wrapper tipis di atas core)
+src-tauri/              Tauri desktop + Android + Tauri commands
+landing/                Landing page GitHub Pages
+.github/workflows/      build.yml · android.yml · pages.yml
+docs/                   Arsitektur, deploy, model, VPS, panduan AI
 ```
-vidboost/
-├─ app/                  # Nuxt 4: UI + komponen
-├─ server-rs/            # Axum API: upload, jobs, ffmpeg, AI adapter
-├─ docs/AI-ENHANCER.md   # Riset & panduan model AI lokal
-├─ scripts/setup-ai.sh   # Installer binary AI portable
-└─ .env.example
+
+Baca detailnya di [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+## Build & rilis
+
+| Workflow | Output |
+|---|---|
+| `build.yml` | Installer Linux, Windows, macOS; draft Release saat tag `v*` |
+| `android.yml` | APK untuk arm64, armv7, i686, x86_64; rilis saat tag `v*` |
+| `pages.yml` | Landing page ke GitHub Pages |
+
+Untuk membuat rilis:
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
 ```
 
-## API
+> GitHub Pages harus diaktifkan sekali di **Settings → Pages → Source: GitHub Actions**.
 
-| Method | Path | Fungsi |
-|---|---|---|
-| POST | `/api/video/upload` | Upload multipart (`file`) → Job |
-| POST | `/api/video/logo?id=` | Upload logo watermark → `{ path }` |
-| POST | `/api/video/process` | `{ id, settings }` → mulai encode async |
-| POST | `/api/video/cancel?id=` | matikan proses ffmpeg/AI yang sedang jalan |
-| GET | `/api/video/job?id=` | Status + progres |
-| GET | `/api/video/source?id=` | Video asli (HTTP Range) |
-| GET | `/api/video/download?id=` | Hasil (attachment, HTTP Range) |
-| GET | `/api/video/thumbnail?id=` | Poster frame |
-| GET | `/api/status` | Kesehatan ffmpeg & AI |
-| GET | `/api/ai/models` | Daftar model AI |
+## Pengaman resource
 
-## Tampilan & arsitektur
+- Batas thread ffmpeg & FSRCNN mengikuti jumlah vCPU
+- Batas output pixel (default 5 MP) agar video tetap bisa diputar di HP
+- Watchdog encode 15 menit, timeout ekstrak frame & upscale 5 menit
+- Upload dibatasi 500 MB di backend; streaming ke disk, bukan RAM
+- Tombol **Batal** mengirim sinyal kill ke proses aktif
 
-Full **claymorphism** dengan dua tema: **Clay Light** (default) dan **Clay Dark**. Tombol toggle ada di header; pilihan tersimpan di localStorage dan diterapkan sebelum hydration.
+## Dokumentasi
 
-Struktur kode mengikuti [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): halaman hanya komposisi, state/aksi di `useVidBoost()`, tipe & konstanta di `utils/`, warna lewat token tema.
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — prinsip & peta lapisan kode
+- [`docs/MODELS.md`](docs/MODELS.md) — semua model AI, plus/minus, cara pasang
+- [`docs/AI-ENHANCER.md`](docs/AI-ENHANCER.md) — riset & alasan pilihan model
+- [`docs/VPS.md`](docs/VPS.md) — deploy VPS shared tanpa sudo
+- [`docs/DEPLOY.md`](docs/DEPLOY.md) — opsi deploy server
 
-## Motion & feedback
+## License
 
-Tombol, chip, dan toggle punya state hover/press yang jelas; panel bawah dan konten tab pakai transisi spring, notifikasi slide-in dengan timer 9 detik, dan progress bar berdenyut. Semua otomatis dinonaktifkan kalau sistem meminta `prefers-reduced-motion`. Tidak ada library animasi tambahan.
-
-## Halaman Export
-
-Di mobile ada tombol **Export** di top bar. Halamannya (`/export`) berisi kontrol output penuh, preview, progress, dan download. Job + setting disimpan di `localStorage`, jadi bisa bolak-balik `/` ↔ `/export` tanpa kehilangan state.
-
-## Mobile
-
-Di lebar <1024px layout berubah jadi mobile-first:
-
-- Preview tampil **paling atas** dan sticky saat scroll, kontrol di bawahnya.
-- Hanya panel Source dan Output yang dibuka default; sisanya di-collapse.
-- Tombol **Enhance video**, progress, dan Download ada di action bar bawah yang sticky (aman dari safe-area iPhone).
-- Tap target diperbesar, slider responsif untuk `pointer: coarse`, input pakai font 16px agar iOS tidak auto-zoom.
-
-Akses dari HP di jaringan yang sama: `http://<IP-LAN>:3000` (atau port yang ditampilkan Nuxt).
-
-## Catatan
-
-- Upload dibatasi 400 MB di UI; backend mengizinkan body sampai 500 MB (`DefaultBodyLimit`). Streaming ke disk, jadi tidak menumpuk di RAM.
-- Encode berjalan sebagai background task di proses backend. Kalau backend di-restart di tengah encode, job ditandai error.
-- Tombol **Batal** (di preview & panel Export) mengirim sinyal kill ke proses aktif lewat `/api/video/cancel`; job ditandai "Dibatalkan oleh pengguna".
-- Mode AI mengekstrak frame ke disk dulu — butuh ruang kosong beberapa kali ukuran video.
-- Simulasi A/B split menyinkronkan kedua video; kalau browser menghambat autoplay, tekan play pada video kiri.
-- Backend mendeteksi encoder yang tersedia. Di mesin tanpa `libx264`/`libx265`, H.264 otomatis pakai `libopenh264` (bitrate adaptif, bukan CRF) dan HEVC tidak tersedia. Cek dengan `ffmpeg -encoders`.
-- `libopenh264` maksimal ~9,2 MP per frame. Faktor upscale otomatis diturunkan kalau hasilnya akan melewati batas itu (mis. video 4K 2x jadi ~1,05x), supaya encode tidak gagal di tengah jalan.
-- Kondisi itu ditampilkan di UI sebagai badge **⚠ N encode** di preview dan tombol peringatan di panel Export. Ketuk untuk melihat alasan + pintasan "Ganti ke WebM + VP9" atau "Turunkan faktor". Daftar encoder tersedia di `GET /api/status` (`encoders`).
+MIT © Mighty-Nievl
