@@ -9,7 +9,7 @@
 [![Deploy Landing](https://github.com/Mighty-Nievl/vidboost/actions/workflows/pages.yml/badge.svg)](https://github.com/Mighty-Nievl/vidboost/actions/workflows/pages.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-7fb524.svg)](LICENSE)
 
-[Web · Landing](https://mighty-nievl.github.io/vidboost/) · [Download](https://github.com/Mighty-Nievl/vidboost/releases) · [Dokumentasi](docs/)
+[Web · Landing](https://vidboost.nievl.site/) · [Download](https://github.com/Mighty-Nievl/vidboost/releases) · [Dokumentasi](docs/)
 
 </div>
 
