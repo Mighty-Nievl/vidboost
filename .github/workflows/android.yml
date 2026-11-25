@@ -92,10 +92,24 @@ jobs:
             src-tauri/gen/android/app/build/outputs/**/*.apk
           if-no-files-found: warn
 
+      - name: Normalize APK names
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          case "${{ matrix.abi }}" in
+            aarch64) ABI=arm64-v8a ;;
+            armv7) ABI=armeabi-v7a ;;
+            i686) ABI=x86 ;;
+            x86_64) ABI=x86_64 ;;
+          esac
+          mkdir -p release-apks
+          cp src-tauri/gen/android/app/build/outputs/apk/universal/debug/app-universal-debug.apk "release-apks/vidboost-${VERSION}-${ABI}.apk"
+
       - name: Release APK pada tag
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: src-tauri/gen/android/app/build/outputs/**/*.apk
+          files: release-apks/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
