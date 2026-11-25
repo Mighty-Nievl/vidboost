@@ -14,6 +14,8 @@ Buat record:
 
 > GitHub Pages tidak mendukung Cloudflare proxy (orange cloud) untuk domain kustom — harus DNS only.
 
+> Gotcha: `wrangler login` (device login) **tidak punya scope DNS edit** — daftar OAuth-nya hanya `zone:read`, `pages:write`, dll. Untuk membuat record DNS lewat API wajib pakai **API Token** dengan template *Edit zone DNS*. Jangan buang waktu dengan device login untuk urusan DNS.
+
 ## GitHub
 
 File `landing/CNAME` berisi `vidboost.nievl.site` dan ikut ter-deploy bersama artifact Pages.
