@@ -72,7 +72,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-ink-950 pb-[9.5rem] text-zinc-100 lg:pb-6">
+  <div class="min-h-screen bg-ink-950 pt-[env(safe-area-inset-top)] pb-[calc(9.5rem+env(safe-area-inset-bottom))] text-zinc-100 lg:pb-6 lg:pt-0">
     <AppHeader />
 
     <main class="mx-auto max-w-[1600px] px-4 pt-4 sm:px-6">
@@ -87,7 +87,7 @@ onBeforeUnmount(() => {
           <Transition name="sheet">
             <section
               v-show="sheetOpen || !isMobile"
-              class="clay-panel fixed inset-x-0 bottom-[58px] z-30 overflow-y-auto px-4 pb-6 pt-2 lg:static lg:z-auto lg:max-h-[calc(100vh_-_5.5rem)] lg:w-full lg:flex-1 lg:overflow-y-auto lg:px-4 lg:pb-4 lg:pt-3"
+              class="clay-panel fixed inset-x-0 bottom-[calc(3.625rem+env(safe-area-inset-bottom))] z-30 overflow-y-auto px-4 pb-6 pt-2 lg:static lg:bottom-auto lg:z-auto lg:max-h-[calc(100vh_-_5.5rem)] lg:w-full lg:flex-1 lg:overflow-y-auto lg:px-4 lg:pb-4 lg:pt-3"
               :class="[
                 isMobile ? (sheetExpanded ? 'max-h-[38vh]' : 'max-h-[108px]') : '',
                 isMobile && !sheetExpanded ? 'overflow-hidden' : '',

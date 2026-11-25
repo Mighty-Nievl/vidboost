@@ -20,7 +20,7 @@ const tabs: Array<{ id: TabId, label: string }> = [
 
 <template>
   <nav
-    class="clay-panel fixed inset-x-0 bottom-0 z-40 flex !rounded-none border-x-0 border-b-0 px-1 pt-1 lg:static lg:z-auto lg:w-[68px] lg:shrink-0 lg:flex-col lg:gap-1 lg:border lg:p-2"
+    class="clay-panel fixed inset-x-0 bottom-[env(safe-area-inset-bottom)] z-40 flex !rounded-none border-x-0 border-b-0 px-1 pt-1 lg:static lg:bottom-auto lg:z-auto lg:w-[68px] lg:shrink-0 lg:flex-col lg:gap-1 lg:border lg:p-2"
     aria-label="Kategori pengaturan"
   >
     <button

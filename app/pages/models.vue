@@ -81,7 +81,7 @@ onMounted(refresh)
 </script>
 
 <template>
-  <div class="min-h-screen bg-ink-950 pb-10 text-zinc-100">
+  <div class="min-h-screen bg-ink-950 pt-[env(safe-area-inset-top)] pb-[calc(2.5rem+env(safe-area-inset-bottom))] text-zinc-100 lg:pb-10 lg:pt-0">
     <header class="sticky top-0 z-30 border-b border-line bg-ink-950">
       <div class="mx-auto flex max-w-4xl items-center gap-3 px-4 py-3 sm:px-6">
         <button type="button" class="clay-btn min-h-[40px] rounded-xl border border-line bg-ink-900 px-3 text-[12px]" @click="navigateTo('/')">

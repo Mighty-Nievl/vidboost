@@ -27,7 +27,7 @@ export default defineNuxtConfig({
       title: 'VidBoost — Video Enhancer',
       meta: [
         { name: 'description', content: 'Enhance video lokal: warna, sharpen, denoise, upscale, kompresi, watermark, crop & rotate. Berbasis ffmpeg.' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
       ],
       link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
       script: [{

@@ -23,7 +23,7 @@ onBeforeUnmount(() => disposeVidBoost())
 </script>
 
 <template>
-  <div class="min-h-screen bg-ink-950 pb-10 text-zinc-100">
+  <div class="min-h-screen bg-ink-950 pt-[env(safe-area-inset-top)] pb-[calc(2.5rem+env(safe-area-inset-bottom))] text-zinc-100 lg:pb-10 lg:pt-0">
     <AppHeader />
 
     <main class="mx-auto max-w-4xl space-y-5 px-4 pt-4 sm:px-6">

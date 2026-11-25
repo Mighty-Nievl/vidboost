@@ -28,7 +28,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   <Transition name="overlay">
     <div
       v-if="!dismissed && (isProcessing || isDone)"
-      class="fixed inset-0 z-[60] flex items-center justify-center bg-ink-950/80 px-4 backdrop-blur-sm"
+      class="fixed inset-0 z-[60] flex items-center justify-center bg-ink-950/80 px-4 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       :aria-label="isProcessing ? 'Memproses video' : 'Export selesai'"
