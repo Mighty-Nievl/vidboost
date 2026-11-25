@@ -1,0 +1,30 @@
+name: Create Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create source archive
+        run: |
+          NAME="${GITHUB_REF_NAME}"
+          git archive --format=tar.gz --prefix="vidboost-${NAME}/" -o "vidboost-${NAME}-source.tar.gz" HEAD
+          ls -lh "vidboost-${NAME}-source.tar.gz"
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: vidboost-*-source.tar.gz
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

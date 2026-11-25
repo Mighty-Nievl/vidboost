@@ -71,7 +71,7 @@ jobs:
           args: --target ${{ matrix.target }}
           tagName: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
           releaseName: 'VidBoost ${{ github.ref_name }}'
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
           uploadArtifacts: true
           includeUpdaterJson: false
