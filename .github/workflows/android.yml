@@ -66,6 +66,15 @@ jobs:
       - name: Install frontend deps
         run: bun install --frozen-lockfile
 
+      - name: Create Android sidecar placeholders
+        shell: bash
+        run: |
+          mkdir -p src-tauri/binaries
+          for triple in aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android; do
+            printf '#!/bin/sh\nexit 0\n' > "src-tauri/binaries/vidboost-server-${triple}"
+            chmod +x "src-tauri/binaries/vidboost-server-${triple}"
+          done
+
       - name: Init Tauri Android project
         run: bunx tauri android init --config src-tauri/tauri.android.conf.json
 
