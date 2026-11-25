@@ -4,7 +4,7 @@ import { useVidBoost } from '~/composables/useVidBoost'
 import { formatDuration, formatSize } from '~/utils/vidboost'
 
 const {
-  job, busy, meta, ffmpegMissing, isDragging, uploadVideo,
+  job, busy, meta, ffmpegMissing, isDragging, uploadVideo, nativeMobile,
 } = useVidBoost()
 
 const fileInput = ref<HTMLInputElement | null>(null)
@@ -63,7 +63,10 @@ function onDrop(event: DragEvent) {
       </dl>
     </div>
 
-    <div v-if="ffmpegMissing" role="alert" class="rounded-xl border border-red-500/30 bg-red-500/5 px-3 py-2.5 text-[12px] text-red-300">
+    <div v-if="nativeMobile" role="status" class="clay-inset rounded-xl bg-ink-900 px-3 py-2.5 text-[11px] leading-snug text-dim">
+      Build Android: engine pemrosesan lokal masih dalam pengembangan. Untuk sementara pakai versi desktop atau web.
+    </div>
+    <div v-else-if="ffmpegMissing" role="alert" class="rounded-xl border border-red-500/30 bg-red-500/5 px-3 py-2.5 text-[12px] text-red-300">
       FFmpeg tidak ditemukan di server. Cek environment FFMPEG_PATH.
     </div>
   </div>

@@ -10,7 +10,7 @@ const {
   settings, formats, codecOptions, presetOptions, chips,
   job, meta, busy, isProcessing, isDone, progressPct,
   startProcess, cancelJob, downloadUrl, encodeWarnings,
-  logEntries, elapsedSeconds, etaSeconds, formatElapsed,
+  logEntries, elapsedSeconds, etaSeconds, formatElapsed, nativeMobile,
 } = useVidBoost()
 
 const showWarnings = ref(false)
@@ -82,7 +82,7 @@ function lowerFactor() {
     <button
       type="button"
       class="clay-btn clay-accent-btn w-full px-4 py-3 text-[13px] font-semibold disabled:cursor-not-allowed disabled:bg-ink-800 disabled:text-dim disabled:shadow-none"
-      :disabled="!job || busy || isProcessing"
+      :disabled="!job || busy || isProcessing || nativeMobile"
       @click="startProcess"
     >{{ isProcessing ? 'Memproses...' : 'Enhance video' }}</button>
 
@@ -125,6 +125,10 @@ function lowerFactor() {
         />
       </div>
     </div>
+
+    <p v-if="nativeMobile" class="clay-inset rounded-xl bg-ink-900 px-3 py-2.5 text-[11px] text-dim">
+      Export belum tersedia di build Android ini. Engine lokal sedang dikerjakan.
+    </p>
 
     <ProcessLog v-if="logEntries.length || isProcessing || isDone" :entries="logEntries" />
 

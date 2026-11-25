@@ -4,6 +4,10 @@ export function isTauriRuntime(): boolean {
   return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window
 }
 
+export function isTauriMobile(): boolean {
+  return isTauriRuntime() && /Android|iPhone|iPad/i.test(navigator.userAgent)
+}
+
 export function apiUrl(path: string): string {
   if (typeof window === 'undefined') return path
   if (isTauriRuntime() && !path.startsWith('http')) {

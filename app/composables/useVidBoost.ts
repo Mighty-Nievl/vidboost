@@ -14,7 +14,9 @@ import {
   type StatusResponse,
   formatElapsed,
 } from '~/utils/vidboost'
-import { apiUrl, request } from '~/utils/api'
+import { apiUrl, isTauriMobile, request } from '~/utils/api'
+
+const nativeMobile = typeof window !== 'undefined' && isTauriMobile()
 
 const MAX_FILE_SIZE = 400 * 1024 * 1024
 
@@ -489,6 +491,7 @@ export function useVidBoost() {
     isDragging,
     previewMode,
     split,
+    nativeMobile,
     logEntries,
     elapsedSeconds,
     etaSeconds,
