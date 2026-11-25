@@ -21,11 +21,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target:
-          - aarch64-linux-android
-          - armv7-linux-androideabi
-          - i686-linux-android
-          - x86_64-linux-android
+        include:
+          - abi: aarch64
+            rust_target: aarch64-linux-android
+          - abi: armv7
+            rust_target: armv7-linux-androideabi
+          - abi: i686
+            rust_target: i686-linux-android
+          - abi: x86_64
+            rust_target: x86_64-linux-android
 
     steps:
       - uses: actions/checkout@v4
@@ -57,7 +61,7 @@ jobs:
       - name: Setup Rust targets
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.target }}
+          targets: ${{ matrix.rust_target }}
 
       - name: Install frontend deps
         run: bun install --frozen-lockfile
@@ -69,12 +73,12 @@ jobs:
         run: bun run generate
 
       - name: Build Android APK (debug, tanpa signing)
-        run: bunx tauri android build --target ${{ matrix.target }} --config src-tauri/tauri.android.conf.json --debug
+        run: bunx tauri android build --target ${{ matrix.abi }} --config src-tauri/tauri.android.conf.json --debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: vidboost-apk-${{ matrix.target }}
+          name: vidboost-apk-${{ matrix.abi }}
           path: |
             src-tauri/gen/android/app/build/outputs/**/*.apk
           if-no-files-found: warn
