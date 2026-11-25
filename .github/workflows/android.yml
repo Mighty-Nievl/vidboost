@@ -41,20 +41,18 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Accept Android SDK licenses
+      - name: Install Android SDK 34 + NDK 26
         shell: bash
         run: |
-          SDKMANAGER="$(find /usr/local/lib/android/sdk/cmdline-tools -type f -name sdkmanager | head -1)"
+          export ANDROID_HOME=/usr/local/lib/android/sdk
+          export ANDROID_SDK_ROOT=$ANDROID_HOME
+          SDKMANAGER="$(find $ANDROID_HOME/cmdline-tools -type f -name sdkmanager | head -1)"
           echo "sdkmanager: $SDKMANAGER"
           yes | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true
-
-      - name: Setup Android SDK 34 + NDK 26
-        uses: android-actions/setup-android@v3
-        with:
-          api-level: 34
-          build-tools: '34.0.0'
-          ndk: '26.1.10909125'
-          cmake: '3.22.1'
+          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0" "ndk;26.1.10909125" "cmake;3.22.1"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "$ANDROID_HOME/ndk/26.1.10909125" > "$GITHUB_WORKSPACE/.ndk-path"
 
       - name: Setup Rust targets
         uses: dtolnay/rust-toolchain@stable
