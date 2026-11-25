@@ -257,16 +257,22 @@ fn setup_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     let backend_dir = data.join("bin");
     fs::create_dir_all(&backend_dir)?;
 
-    app.shell()
-        .sidecar("vidboost-server")?
-        .env("PORT", BACKEND_PORT)
-        .env("DATA_DIR", data.join("data"))
-        .env("AI_MODEL_DIR", &models)
-        .env("FSRCNN_MODEL_DIR", &models)
-        .env("AI_UPSCALER_BIN", &wrapper)
-        .env("FFMPEG_PATH", "ffmpeg")
-        .env("FFPROBE_PATH", "ffprobe")
-        .spawn()?;
+    // Mobile tidak memakai sidecar. Jangan pernah gagal startup karena ini.
+    #[cfg(not(mobile))]
+    if let Ok(command) = app.shell().sidecar("vidboost-server") {
+        if let Err(err) = command
+            .env("PORT", BACKEND_PORT)
+            .env("DATA_DIR", data.join("data"))
+            .env("AI_MODEL_DIR", &models)
+            .env("FSRCNN_MODEL_DIR", &models)
+            .env("AI_UPSCALER_BIN", &wrapper)
+            .env("FFMPEG_PATH", "ffmpeg")
+            .env("FFPROBE_PATH", "ffprobe")
+            .spawn()
+        {
+            eprintln!("gagal menjalankan sidecar backend: {err}");
+        }
+    }
 
     Ok(())
 }
